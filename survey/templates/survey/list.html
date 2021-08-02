@@ -1,0 +1,18 @@
+{% extends 'survey/base.html' %}
+{% load i18n %}
+
+{% block body %}
+    <ul class="list-group">
+        {% for survey in surveys %}
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">{{survey.title}}</div>
+                <span>Duration: {{survey.duration}} mins</span>
+            </div>
+            <span class="badge bg-primary rounded-pill">
+                <a class="btn btn-sm btn-primary" href="">{% trans "Take the Survey"%}</a>
+            </span>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
