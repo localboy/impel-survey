@@ -1,0 +1,4 @@
+django>=3.0, <4.0
+flake8>=3.9.0
+psycopg2-binary>=2.8
+python-decouple==3.4
