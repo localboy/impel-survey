@@ -1,0 +1,41 @@
+{% extends 'survey/base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block title %} {{survey.name}} {% endblock title %}
+
+{% block extrajs %}
+
+{% endblock %}
+
+{% block extracss %}
+
+{% endblock %}
+
+
+{% block body %}
+<h1> {{survey.title}} </h1>
+<div class="survey-description"> {{survey.description|safe}} </div>
+<div>
+    {% if step and step != 0 %}
+    <form action="{% url 'survey-detail-step' id=survey.id step=step %}" method="post">
+        {% else %}
+        <form action="{% url 'survey-detail' id=survey.id %}" method="post">
+            {% endif %}
+            {% csrf_token %}
+            {% include "survey/question.html" %}
+            <br>
+            {% if response_form.response is None %}
+                {% if response_form.has_prev_step %}
+                <a href="{{ response_form.prev_step_url }}" class="btn btn-default btn-lg" value="{% trans " Prev!" %}">Prev</a>
+                {% endif %}
+                {% if response_form.has_next_step %}
+                <input class="btn btn-default btn-lg" type="submit" value="{% trans " Next!" %}">
+                {% else %}
+                <input class="btn btn-default btn-lg" type="submit" value="{% trans " I'm done!" %}">
+                {% endif %}
+            {% endif %}
+        </form>
+</div>
+{% endblock %}
