@@ -25,7 +25,10 @@ def valid_survey(func):
         # Once user start the survey, whether he can submit or not,
         # he will not able to participate again.
         if session_key in request.session:
-            return redirect(reverse("survey-participated"))
+            session_data = request.session[session_key]
+            # If survey time is up
+            if session_data['remaining'] == 0:
+                return redirect(reverse("survey-participated"))
         return func(self, request, *args, **kwargs, survey=survey)
 
     return survey_check
