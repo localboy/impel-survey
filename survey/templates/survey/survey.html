@@ -15,9 +15,21 @@
 
 
 {% block body %}
-<h1> {{survey.title}} </h1>
-<div class="survey-description"> {{survey.description|safe}} </div>
-<div>
+<div class="row">
+    <div class="col-12">
+        <h1>Survey on {{survey.title}} </h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6 text-start">
+        <p class="fw-bold">You are in {{step|add:1}} of {{response_form.steps_count}}</p>
+    </div>
+    <div class="col-6 text-end">
+        <p class="fw-bold"><span class="badge bg-primary text-wrap" style="width: 6rem;" id="time"></span> minutes!</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
     {% if step and step != 0 %}
     <form action="{% url 'survey-detail-step' id=survey.id step=step %}" method="post">
         {% else %}
@@ -37,5 +49,56 @@
                 {% endif %}
             {% endif %}
         </form>
+    </div>
 </div>
+<script>
+    function startTimer(duration, display) {
+        var start = Date.now(),
+            diff,
+            minutes,
+            seconds;
+        function timer() {
+            // get the number of seconds that have elapsed since 
+            // startTimer() was called
+            diff = duration - (((Date.now() - start) / 1000) | 0);
+
+            // does the same job as parseInt truncates the float
+            minutes = (diff / 60) | 0;
+            seconds = (diff % 60) | 0;
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = minutes + ":" + seconds; 
+
+            if (diff == 0) {
+                // add one second so that the count down starts at the full duration
+                // example 05:00 not 04:59
+                // start = Date.now() + 1000;
+                console.log('Time up')
+                axios.post('/survey/{{survey.id}}/', {
+                    firstName: 'Fred',
+                    lastName: 'Flintstone'
+                })
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+                // location.reload()
+
+            }
+        };
+        // we don't want to wait a full second before the timer starts
+        timer();
+        setInterval(timer, 1000);
+    }
+
+    window.onload = function () {
+        var fiveMinutes = {{time_remaining}},
+            display = document.querySelector('#time');
+        startTimer(fiveMinutes, display);
+    };
+</script>
 {% endblock %}

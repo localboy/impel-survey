@@ -1,4 +1,6 @@
+from datetime import datetime, timedelta
 import logging
+from django.forms.widgets import DateInput
 from django.views.generic import TemplateView, View
 from django.shortcuts import redirect, render, reverse, get_object_or_404
 
@@ -43,7 +45,12 @@ class SurveyDetail(View):
         self.session_key = 'survey_{}_{}'.format(request.user.id, kwargs['id'])
         if self.session_key not in request.session:
             request.session[self.session_key] = {}
+            request.session[self.session_key]['end_date'] = datetime.timestamp(datetime.now())
+            request.session[self.session_key]['end_date'] = datetime.timestamp(
+                datetime.now() + timedelta(minutes=self.survey.duration))
 
+        remaining_time = request.session[self.session_key]['end_date'] - datetime.timestamp(datetime.now())
+        request.session[self.session_key]['remaining'] = remaining_time if remaining_time>=0 else 0
         self.session_data = request.session[self.session_key]
 
         return super().setup(request, *args, **kwargs)
@@ -60,6 +67,7 @@ class SurveyDetail(View):
             "response_form": form,
             "survey": self.survey,
             "step": self.step,
+            "time_remaining": int(self.session_data['remaining']),
         }
         return render(request, template_name, context)
 
