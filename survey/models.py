@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
@@ -48,6 +49,9 @@ class Survey(models.Model):
         verbose_name = _("Survey")
         verbose_name_plural = _("Surveys")
 
+    def get_absolute_url(self):
+        return reverse("survey-detail", kwargs={"id": self.pk})
+
     def __str__(self):
         return str(self.title)
 
@@ -65,7 +69,8 @@ class Question(models.Model):
     question_type = models.CharField(
         max_length=20, choices=QuestionType.choices, default=QuestionType.TEXT
     )
-    choices = models.TextField(help_text=QUESTION_CHOICE_HELP_TEXT)
+    choices = models.TextField(
+        help_text=QUESTION_CHOICE_HELP_TEXT, blank=True, null=True)
 
     class Meta:
         verbose_name = _("question")
@@ -76,8 +81,31 @@ class Question(models.Model):
             validate_choices(self.choices)
         super().save(*args, **kwargs)
 
+    def get_clean_choices(self):
+        """
+        Return split and stripped list of choices with no null values.
+        """
+        if self.choices is None:
+            return []
+        choices_list = []
+        for choice in self.choices.split(","):
+            choice = choice.strip()
+            if choice:
+                choices_list.append(choice)
+        return choices_list
+
+    def get_choices(self):
+        """
+        Return a tuple for the 'choices' argument of a form widget.
+        """
+        choices_list = []
+        for choice in self.get_clean_choices():
+            choices_list.append((slugify(choice, allow_unicode=True), choice))
+        choices_tuple = tuple(choices_list)
+        return choices_tuple
+
     def __str__(self):
-        return "Question '{self.text}'"
+        return f"Question {self.text}"
 
 
 class Response(models.Model):
@@ -93,7 +121,7 @@ class Response(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return "Response to {self.survey} by {self.user}"
+        return f"Response to {self.survey} by {self.user}"
 
 
 class Answer(models.Model):
@@ -109,5 +137,30 @@ class Answer(models.Model):
     updated = models.DateTimeField(_("Update date"), auto_now=True)
     body = models.TextField(_("Content"), blank=True, null=True)
 
+    def __init__(self, *args, **kwargs):
+        try:
+            question = Question.objects.get(pk=kwargs["question_id"])
+        except KeyError:
+            question = kwargs.get("question")
+        body = kwargs.get("body")
+        if question and body:
+            self.check_answer_body(question, body)
+        super().__init__(*args, **kwargs)
+
+    def check_answer_body(self, question, body):
+        """
+        Check if the answer body is in question choices if the question is
+        in Radio or Select type
+        """
+        if question.question_type in [QuestionType.RADIO, QuestionType.SELECT]:
+            choices = question.get_clean_choices()
+            if body:
+                answers = [body]
+            for answer in answers:
+                if answer not in choices:
+                    msg = f"Answer '{body}' should be in {choices} "
+                    raise ValidationError(msg)
+
     def __str__(self):
-        return "{self.__class__.__name__} to '{self.question}' : '{self.body}'"
+        return f"{self.__class__.__name__} to \
+            '{self.question}' : '{self.body}'"
