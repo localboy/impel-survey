@@ -11,5 +11,5 @@ urlpatterns = [
     path('survey/<id>/', SurveyDetail.as_view(), name='survey-detail'),
     path('<id>-<step>/', SurveyDetail.as_view(), name="survey-detail-step"),
     path('survey/<response_id>/confirm/', ConfirmView.as_view(), name="survey-confirmation"),
-    path('survey/<response_id>/timeout/', TimeOutView.as_view(), name="survey-confirmation"),
+    path('survey/<response_id>/timeout/', TimeOutView.as_view(), name="survey-timeout"),
 ]
