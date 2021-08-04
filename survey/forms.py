@@ -2,6 +2,7 @@ import argparse
 import logging
 
 from django import forms
+from django.db import transaction
 from django.forms import models
 from django.urls import reverse
 from django.utils.text import slugify
@@ -265,24 +266,23 @@ class ResponseForm(models.ModelForm):
         Recover an existing response from the database if any.
         There is only one response by logged user.
         """
-        response = self._get_preexisting_response()
+        while transaction.atomic():
+            response = self._get_preexisting_response()
 
-        if response is None:
-            response = super().save(commit=False)
-        response.survey = self.survey
-        response.user = self.user
-        response.save()
+            if response is None:
+                response = super().save(commit=False)
+            response.survey = self.survey
+            response.user = self.user
+            response.save()
 
-        # create an answer object for each question and associate it with this
-        # response.
-        for field_name, field_value in list(self.cleaned_data.items()):
-            if field_name.startswith("question_"):
-                q_id = int(field_name.split("_")[1])
-                question = Question.objects.get(pk=q_id)
-                answer = self._get_preexisting_answer(question)
-                if answer is None:
+            # create an answer object for each question and associate it 
+            # with this response.
+            for field_name, field_value in list(self.cleaned_data.items()):
+                if field_name.startswith("question_"):
+                    q_id = int(field_name.split("_")[1])
+                    question = Question.objects.get(pk=q_id)
                     answer = Answer(question=question)
-                answer.body = field_value
-                answer.response = response
-                answer.save()
-        return response
+                    answer.body = field_value
+                    answer.response = response
+                    answer.save()
+            return response
