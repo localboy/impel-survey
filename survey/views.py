@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import logging
-from django.forms.widgets import DateInput
+from django.http.response import JsonResponse
 from django.views.generic import TemplateView, View
 from django.shortcuts import redirect, render, reverse, get_object_or_404
 
@@ -159,3 +159,29 @@ class SurveyPerticipated(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+
+
+def timeout(request, id: int):
+    """
+    API endpoint for saving user input from session of a survey when 
+    the survey time is out.
+    """
+
+    session_key = 'survey_{}_{}'.format(request.user.id, id)
+    survey = get_object_or_404(Survey, id=id)
+    if session_key in request.session:
+        session_data = request.session[session_key]
+        save_form = ResponseForm(
+            request.session[session_key],
+            survey=survey,
+            user=request.user,
+            session_data=session_data
+        )
+        if save_form.is_valid():
+            response = save_form.save()
+            del request.session[session_key]
+            return JsonResponse(
+                {"status": "success", "response_id": response.id},
+                status=200)
+        else:
+            return JsonResponse({"status": "fail"}, status=400)
