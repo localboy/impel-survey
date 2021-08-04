@@ -28,9 +28,13 @@ class SurveyInstruction(View):
 
     @valid_survey
     def get(self, request, *args, **kwargs):
+        session_key = kwargs['session_key']
+        survey = kwargs['survey']
+        if session_key in request.session:
+            return redirect(survey.get_absolute_url())
         template_name = 'survey/instruction.html'
         context = {}
-        context['survey'] = kwargs["survey"]
+        context['survey'] = survey
         return render(request, template_name, context)
 
 

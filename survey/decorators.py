@@ -29,6 +29,6 @@ def valid_survey(func):
             # If survey time is up
             if session_data['remaining'] == 0:
                 return redirect(reverse("survey-participated"))
-        return func(self, request, *args, **kwargs, survey=survey)
+        return func(self, request, *args, **kwargs, survey=survey, session_key=session_key)
 
     return survey_check
