@@ -16,18 +16,22 @@ class IndexView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        surveys = Survey.objects.all()
+        surveys = Survey.objects.exclude(responses__user=self.request.user)    
         context["surveys"] = surveys
         return context
 
 
-class SurveyInstruction(TemplateView):
-    template_name = 'survey/instruction.html'
+class SurveyInstruction(View):
+    """
+    View for instructions
+    """
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['survey'] = Survey.objects.get(id=kwargs['id'])
-        return context
+    @valid_survey
+    def get(self, request, *args, **kwargs):
+        template_name = 'survey/instruction.html'
+        context = {}
+        context['survey'] = kwargs["survey"]
+        return render(request, template_name, context)
 
 
 class SurveyDetail(View):
