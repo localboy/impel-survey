@@ -7,7 +7,7 @@
     <h1> {{survey.title}} </h1>
     <p> {{survey.description|safe}} </p>
     <h2>Please read instruction before you proceed.</h2>
-    <a class="btn btn-success" href="">Start</a>
+    <a class="btn btn-success" href="{{survey.get_absolute_url}}">Start</a>
 </div>
 
 {% endblock %}
