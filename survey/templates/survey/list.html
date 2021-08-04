@@ -10,7 +10,7 @@
                 <span>Duration: {{survey.duration}} mins</span>
             </div>
             <span class="badge bg-primary rounded-pill">
-                <a class="btn btn-sm btn-primary" href="">{% trans "Take the Survey"%}</a>
+                <a class="btn btn-sm btn-primary" href="survey/{{survey.id}}/instructions/">{% trans "Take the Survey"%}</a>
             </span>
         </li>
         {% endfor %}
