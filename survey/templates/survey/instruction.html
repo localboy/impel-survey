@@ -1,13 +1,22 @@
 {% extends 'survey/base.html' %}
 
-{% block title %} {{survey.name}} {% endblock title %}
+{% block title %} {{survey.title}} {% endblock title %}
 
 {% block body %}
 <div class="text-center">
     <h1> {{survey.title}} </h1>
     <p> {{survey.description|safe}} </p>
     <h2>Please read instruction before you proceed.</h2>
-    <a class="btn btn-success" href="{{survey.get_absolute_url}}">Start</a>
 </div>
+<div class="card mb-4">
+    <div class="card-body fw-bold">
+        <ol>
+            <li>The survey will take {{survey.duration}} minutes.</li>
+            <li>Once you start, you can't push or resuve it.</li>
+            <li>You have to complete within the time.</li>
+        </ol>
+    </div>
+</div>
+<a class="btn btn-success" href="{{survey.get_absolute_url}}">Yes, I'm ready to Start</a>
 
 {% endblock %}
