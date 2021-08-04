@@ -40,12 +40,12 @@
             <br>
             {% if response_form.response is None %}
                 {% if response_form.has_prev_step %}
-                <a href="{{ response_form.prev_step_url }}" class="btn btn-default btn-lg" value="{% trans " Prev!" %}">Prev</a>
+                <input class="btn btn-default btn-lg" name="step_type" type="submit" value="Prev!">
                 {% endif %}
                 {% if response_form.has_next_step %}
-                <input class="btn btn-default btn-lg" type="submit" value="{% trans " Next!" %}">
+                <input class="btn btn-default btn-lg" name="step_type" type="submit" value="Next!">
                 {% else %}
-                <input class="btn btn-default btn-lg" type="submit" value="{% trans " I'm done!" %}">
+                <input class="btn btn-default btn-lg" name="step_type" type="submit" value="Submit">
                 {% endif %}
             {% endif %}
         </form>

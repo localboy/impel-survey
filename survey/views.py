@@ -97,9 +97,29 @@ class SurveyDetail(View):
         for key, value in list(form.cleaned_data.items()):
             request.session[session_key][key] = value
             request.session.modified = True
-        next_url = form.next_step_url()
-        response = None
+        request_step = request.POST['step_type']
+        if request_step == 'Prev!':
+            # if there is previous step
+            prev_url = form.prev_step_url()
+            if prev_url is not None:
+                return redirect(prev_url)
+            prev_ = request.session.get("prev", None)
+            if prev_ is  not None:
+                if "prev" in request.session:
+                    del request.session["prev"]
+                return redirect(prev_)
+        else:
+            # if there is a next step
+            next_url = form.next_step_url()
+            if next_url is not None:
+                return redirect(next_url)
+            next_ = request.session.get("next", None)
+            if next_ is not None:
+                if "next" in request.session:
+                    del request.session["next"]
+                return redirect(next_)        
 
+        response = None
         # when it's the last step
         if not form.has_next_step():
             save_form = ResponseForm(
@@ -113,18 +133,9 @@ class SurveyDetail(View):
             else:
                 LOGGER.warning("A step of the multipage form failed",
                 "but should have been discovered before.")
-
-        # if there is a next step
-        if next_url is not None:
-            return redirect(next_url)
         del request.session[session_key]
         if response is None:
             return redirect(reverse("survey-list"))
-        next_ = request.session.get("next", None)
-        if next_ is not None:
-            if "next" in request.session:
-                del request.session["next"]
-            return redirect(next_)
         return redirect("survey-confirmation", response_id=response.id)
 
 
