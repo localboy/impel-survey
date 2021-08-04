@@ -72,21 +72,19 @@
             display.textContent = minutes + ":" + seconds; 
 
             if (diff == 0) {
-                // add one second so that the count down starts at the full duration
-                // example 05:00 not 04:59
-                // start = Date.now() + 1000;
-                console.log('Time up')
-                axios.post('/survey/{{survey.id}}/', {
-                    firstName: 'Fred',
-                    lastName: 'Flintstone'
-                })
+                // When the time is out send request to timout api
+                // to save user input from sassion
+                // if successfuly save the data, then redirect to
+                // timeout view otherwise survey list view
+                axios.get('/api/survey/{{survey.id}}/timeout/')
                 .then(function (response) {
-                    console.log(response);
+                    const response_id = response.data.response_id
+                    location.replace('/survey/'+response_id+'/timeout/')
                 })
                 .catch(function (error) {
                     console.log(error);
+                    location.replace('/')
                 });
-                // location.reload()
 
             }
         };
