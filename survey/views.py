@@ -150,3 +150,12 @@ class ConfirmView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['response'] = get_object_or_404(Response, id=kwargs['response_id'])
         return context
+
+
+class SurveyPerticipated(TemplateView):
+
+    template_name = 'survey/participated.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
