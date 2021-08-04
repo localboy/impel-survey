@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 from django.http.response import JsonResponse
 from django.views.generic import TemplateView, View
 from django.shortcuts import redirect, render, reverse, get_object_or_404
@@ -158,6 +158,19 @@ class SurveyPerticipated(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        return context
+
+
+class TimeOutView(TemplateView):
+    """
+    View to show timeout message.
+    """
+    template_name = 'survey/timeout.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['response'] = get_object_or_404(Response, id=kwargs['response_id'])
+        context["msg"] = "You time is out. Thanks for perticipating in the survey"
         return context
 
 

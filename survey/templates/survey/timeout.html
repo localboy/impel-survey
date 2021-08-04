@@ -1,0 +1,15 @@
+{% extends 'survey/base.html' %}
+{% load i18n %}
+
+{% block title %} {{'Survey time out'}} {% endblock title %}
+
+{% block body %}
+<div class="text-center">
+    <h1>Survey time out!</h1>
+
+    <div class="alert alert-success">
+       <h2>{{msg}}</h2 >
+    </div>
+    <h5>We appreciate the time you spent and your contribution.</h5>
+</div>
+{% endblock %}

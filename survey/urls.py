@@ -1,7 +1,7 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import path
 
-from .views import ConfirmView, IndexView, SurveyPerticipated, SurveyInstruction, SurveyDetail, timeout
+from .views import ConfirmView, IndexView, SurveyPerticipated, SurveyInstruction, SurveyDetail, TimeOutView, timeout
 
 urlpatterns = [
     path('', staff_member_required(IndexView.as_view()), name='survey-list'),
@@ -11,4 +11,5 @@ urlpatterns = [
     path('survey/<id>/', SurveyDetail.as_view(), name='survey-detail'),
     path('<id>-<step>/', SurveyDetail.as_view(), name="survey-detail-step"),
     path('survey/<response_id>/confirm/', ConfirmView.as_view(), name="survey-confirmation"),
+    path('survey/<response_id>/timeout/', TimeOutView.as_view(), name="survey-confirmation"),
 ]
