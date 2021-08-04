@@ -9,7 +9,7 @@ class QuestionInline(admin.StackedInline):
 
 
 class SurveyAdmin(admin.ModelAdmin):
-    list_display = ("title", "duration", "created_by", "created_at")
+    list_display = ("title", "duration", "created_by", "created_at", "total_responses")
     list_filter = ("created_by", "created_at")
     inlines = [QuestionInline]
 
@@ -30,7 +30,5 @@ class ResponseAdmin(admin.ModelAdmin):
     readonly_fields = ("survey", "created_at", "updated_at","user")
 
 
-# admin.site.register(Question, QuestionInline)
-# admin.site.register(Category, CategoryInline)
 admin.site.register(Survey, SurveyAdmin)
 admin.site.register(Response, ResponseAdmin)
