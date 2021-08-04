@@ -170,7 +170,7 @@ class TimeOutView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['response'] = get_object_or_404(Response, id=kwargs['response_id'])
-        context["msg"] = "You time is out. Thanks for perticipating in the survey"
+        context["msg"] = "Your time is out. Thanks for perticipating in the survey"
         return context
 
 
