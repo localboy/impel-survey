@@ -203,9 +203,9 @@ class ResponseForm(models.ModelForm):
         :rtype: django.forms.fields
         """
         try:
-            return self.FIELDS[question.question_type](**kwargs)
+            return self.FIELDS[question.question_type](required=False, **kwargs)
         except KeyError:
-            return forms.ChoiceField(**kwargs)
+            return forms.ChoiceField(required=False, **kwargs)
 
     def add_question(self, question, data):
         """
