@@ -41,6 +41,7 @@ class Survey(models.Model):
     title = models.CharField(max_length=400)
     description = models.TextField()
     duration = models.IntegerField(help_text="Survey duration in minutes")
+    # expire_date = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="surveys")
@@ -48,6 +49,12 @@ class Survey(models.Model):
     class Meta:
         verbose_name = _("Survey")
         verbose_name_plural = _("Surveys")
+
+    def total_responses(self):
+        return self.responses.count()
+    
+    def get_instruction_url(self):
+        return reverse("survey-instructions", kwargs={"id": self.pk})
 
     def get_absolute_url(self):
         return reverse("survey-detail", kwargs={"id": self.pk})
@@ -108,6 +115,11 @@ class Question(models.Model):
         return f"Question {self.text}"
 
 
+# class ResponseType(models.TextChoices):
+#     SUBMITTED = 'submitted', 'Submitted'
+#     TIMEUP = 'timeup', 'Time Up'
+
+
 class Response(models.Model):
     """
     Response object collection of questions and answer
@@ -117,6 +129,9 @@ class Response(models.Model):
         Survey, on_delete=models.CASCADE, related_name="responses")
     user = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True)
+    # type = models.CharField(
+    #     max_length=20, choices=ResponseType.choices, default=ResponseType.SUBMITTED
+    # )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
