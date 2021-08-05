@@ -15,12 +15,13 @@ def valid_survey(func):
     @wraps(func)
     def survey_check(self, request, *args, **kwargs):
         session_key = 'survey_{}_{}'.format(request.user.id, kwargs['id'])
+        survey_status = ''
         survey = get_object_or_404(
             Survey.objects.prefetch_related("questions", "responses"), id=kwargs["id"])
-        
+
         # checking if there any existing response
-        if survey.responses.filter(user = request.user).count()>0:
-            return redirect(reverse("survey-participated"))
+        if survey.responses.filter(user=request.user).count() > 0:
+            survey_status = 'participated'
 
         # Once user start the survey, whether he can submit or not,
         # he will not able to participate again.
@@ -28,7 +29,8 @@ def valid_survey(func):
             session_data = request.session[session_key]
             # If survey time is up
             if session_data['remaining'] == 0:
-                return redirect(reverse("survey-participated"))
-        return func(self, request, *args, **kwargs, survey=survey, session_key=session_key)
+                survey_status = 'timeout'
+        return func(self, request, *args, **kwargs, survey=survey, session_key=session_key,\
+                    survey_status=survey_status)
 
     return survey_check
