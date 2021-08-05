@@ -7,7 +7,7 @@ from django.shortcuts import redirect, render, reverse, get_object_or_404
 
 from survey.decorators import valid_survey
 from .forms import ResponseForm
-from .models import Response, Survey
+from .models import Response, Survey, ResponseType
 
 LOGGER = logging.getLogger(__name__)
 
@@ -200,6 +200,7 @@ def timeout(request, id: int):
     session_key = 'survey_{}_{}'.format(request.user.id, id)
     survey = get_object_or_404(Survey, id=id)
     if session_key in request.session:
+        request.session[session_key]['response_type'] = ResponseType.TIMEUP
         session_data = request.session[session_key]
         save_form = ResponseForm(
             request.session[session_key],

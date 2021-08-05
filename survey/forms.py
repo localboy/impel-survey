@@ -271,6 +271,8 @@ class ResponseForm(models.ModelForm):
 
             if response is None:
                 response = super().save(commit=False)
+            if 'response_type' in self.session_data:
+                response.response_type = self.session_data['response_type']
             response.survey = self.survey
             response.user = self.user
             response.save()
