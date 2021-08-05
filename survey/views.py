@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http.response import JsonResponse
 from django.views.generic import TemplateView, View
 from django.shortcuts import redirect, render, reverse, get_object_or_404
@@ -189,6 +190,7 @@ class TimeOutView(TemplateView):
         return context
 
 
+@staff_member_required
 def timeout(request, id: int):
     """
     API endpoint for saving user input from session of a survey when 
