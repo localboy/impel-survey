@@ -28,6 +28,11 @@ class SurveyInstruction(View):
 
     @valid_survey
     def get(self, request, *args, **kwargs):
+        survey_status = kwargs['survey_status']
+        # Checking if already participated
+        if survey_status and survey_status in ['participated', 'timeout']:
+            return redirect(reverse("survey-participated"))
+
         session_key = kwargs['session_key']
         survey = kwargs['survey']
         if session_key in request.session:
@@ -48,6 +53,7 @@ class SurveyDetail(View):
         """
         Setup session and initializing values
         """
+        self.survey_status = kwargs['survey_status']
         self.survey = kwargs.get("survey")
         self.step = kwargs.get("step", 0)
         self.session_key = 'survey_{}_{}'.format(request.user.id, kwargs['id'])
@@ -64,6 +70,11 @@ class SurveyDetail(View):
         return super().setup(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
+
+        # Checking if already participated
+        if self.survey_status and self.survey_status in ['participated', 'timeout']:
+            return redirect(reverse("survey-participated"))
+
         template_name = "survey/survey.html"
         form = ResponseForm(
             survey=self.survey,
