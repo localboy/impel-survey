@@ -22,8 +22,8 @@ class AnswerBaseInline(admin.StackedInline):
 
 
 class ResponseAdmin(admin.ModelAdmin):
-    list_display = ("survey", "created_at", "user")
-    list_filter = ("survey", "created_at")
+    list_display = ("survey", "created_at", "user", "response_type")
+    list_filter = ("survey", "response_type", "created_at")
     date_hierarchy = "created_at"
     inlines = [AnswerBaseInline]
     # specifies the order as well as which fields to act on
