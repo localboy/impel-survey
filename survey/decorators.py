@@ -1,6 +1,9 @@
 import logging
-from datetime import date
+import pytz
+from datetime import datetime
 from functools import wraps
+
+utc=pytz.UTC
 
 from django.shortcuts import Http404, get_object_or_404, redirect, reverse
 
@@ -18,6 +21,10 @@ def valid_survey(func):
         survey_status = ''
         survey = get_object_or_404(
             Survey.objects.prefetch_related("questions", "responses"), id=kwargs["id"])
+        
+        if survey.expire_date< utc.localize(datetime.now()):
+            msg = "Survey already expired at: '%s'."
+            raise Http404
 
         # checking if there any existing response
         if survey.responses.filter(user=request.user).count() > 0:
